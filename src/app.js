@@ -13,8 +13,28 @@ const app = express();
 // Connect to MongoDB
 connectDB();
 
+const allowedOrigins = [
+  "https://backend-aura-bitz.onrender.com",
+  "http://localhost:3000",
+  "http://localhost:5173",
+];
+
 // Middlewares
-app.use(cors({ origin: "*" }));
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      // allow requests with no origin (like Postman, server-to-server)
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  })
+);
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
 
