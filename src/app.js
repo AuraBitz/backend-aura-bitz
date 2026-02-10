@@ -13,6 +13,7 @@ const app = express();
 // Connect to MongoDB
 connectDB();
 
+// Allowed origins
 const allowedOrigins = [
   "https://aura-bitz-website-m2nf1zw58-aura-bitzs-projects.vercel.app",
   "https://backend-aura-bitz.onrender.com",
@@ -20,18 +21,20 @@ const allowedOrigins = [
   "http://localhost:5173",
 ];
 
-// Middlewares
+// =====================
+// CORS CONFIG (FIXED)
+// =====================
 app.use(
   cors({
     origin: function (origin, callback) {
-      // Allow Postman, curl, server-to-server
+      // Allow Postman, curl, server-to-server requests
       if (!origin) return callback(null, true);
 
       if (allowedOrigins.includes(origin)) {
         return callback(null, true);
       }
 
-      return callback(new Error("CORS not allowed"));
+      return callback(new Error("Not allowed by CORS"));
     },
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
@@ -39,9 +42,7 @@ app.use(
   })
 );
 
-
-app.options("*", cors());
-
+// Body parsers
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
 
@@ -50,7 +51,9 @@ if (config.nodeEnv === "development") {
   app.use(morgan("dev"));
 }
 
+// =====================
 // Health check route
+// =====================
 app.get("/api/health", (req, res) => {
   const dbState = mongoose.connection.readyState;
   const dbStatus = {
@@ -69,10 +72,14 @@ app.get("/api/health", (req, res) => {
   });
 });
 
+// =====================
 // API Routes
+// =====================
 app.use("/api/v1", routes);
 
+// =====================
 // Error handling
+// =====================
 app.use(notFound);
 app.use(errorHandler);
 
