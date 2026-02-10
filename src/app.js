@@ -8,13 +8,19 @@ const connectDB = require("./config/db");
 const routes = require("./routes");
 const { errorHandler, notFound } = require("./middlewares");
 
-// Initialize express app
+// =====================
+// Initialize app
+// =====================
 const app = express();
 
+// =====================
 // Connect to MongoDB
+// =====================
 connectDB();
 
+// =====================
 // Allowed origins
+// =====================
 const allowedOrigins = [
   "https://aura-bitz-website-m2nf1zw58-aura-bitzs-projects.vercel.app",
   "https://backend-aura-bitz.onrender.com",
@@ -23,19 +29,24 @@ const allowedOrigins = [
 ];
 
 // =====================
-// CORS CONFIG (FIXED)
+// CORS CONFIG (FINAL FIX)
 // =====================
 app.use(
   cors({
     origin: function (origin, callback) {
-      // Allow Postman, curl, server-to-server requests
+      // Allow Postman, curl, server-to-server
       if (!origin) return callback(null, true);
 
-      if (allowedOrigins.includes(origin)) {
+      // Allow exact origins + all Vercel subdomains
+      if (
+        allowedOrigins.includes(origin) ||
+        origin.endsWith(".vercel.app")
+      ) {
         return callback(null, true);
       }
 
-      return callback(new Error("Not allowed by CORS"));
+      // Do NOT throw error (prevents fake CORS error)
+      return callback(null, false);
     },
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
@@ -43,20 +54,26 @@ app.use(
   })
 );
 
-// Serve static files (logo etc. for emails)
+// =====================
+// Static files (email logos, etc.)
+// =====================
 app.use("/public", express.static(path.join(__dirname, "../public")));
 
+// =====================
 // Body parsers
+// =====================
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
 
-// Logging in development
+// =====================
+// Logging
+// =====================
 if (config.nodeEnv === "development") {
   app.use(morgan("dev"));
 }
 
 // =====================
-// Health check route
+// Health check
 // =====================
 app.get("/api/health", (req, res) => {
   const dbState = mongoose.connection.readyState;
