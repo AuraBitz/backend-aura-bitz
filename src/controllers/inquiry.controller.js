@@ -1,6 +1,7 @@
 const { Inquiry } = require("../models");
 const { ApiResponse, asyncHandler } = require("../utils");
 const { validateCreateInquiry, validateUpdateInquiry } = require("../validators/inquiry.validator");
+const { sendInquiryEmails } = require("../services/email.service");
 
 /**
  * @desc    Create a new inquiry
@@ -12,14 +13,22 @@ const createInquiry = asyncHandler(async (req, res) => {
     return ApiResponse.badRequest(res, "Validation failed", errors);
   }
 
-  const { name, phoneNumber, companyName, service, message } = req.body;
+  const { name, email, phoneNumber, companyName, service, message } = req.body;
 
   const inquiry = await Inquiry.create({
     name,
+    email,
     phoneNumber,
     companyName: companyName || null,
     service,
     message,
+  });
+
+  // Send emails (non-blocking - don't fail the request if email fails)
+  sendInquiryEmails(inquiry).then((result) => {
+    console.log("Email results:", result);
+  }).catch((err) => {
+    console.error("Email sending error:", err.message);
   });
 
   return ApiResponse.created(res, inquiry, "Inquiry created successfully");
@@ -41,6 +50,7 @@ const getInquiries = asyncHandler(async (req, res) => {
   if (search) {
     filter.$or = [
       { name: { $regex: search, $options: "i" } },
+      { email: { $regex: search, $options: "i" } },
       { companyName: { $regex: search, $options: "i" } },
       { service: { $regex: search, $options: "i" } },
       { phoneNumber: { $regex: search, $options: "i" } },
@@ -95,7 +105,7 @@ const updateInquiry = asyncHandler(async (req, res) => {
     return ApiResponse.badRequest(res, "Validation failed", errors);
   }
 
-  const allowedFields = ["name", "phoneNumber", "companyName", "service", "message"];
+  const allowedFields = ["name", "email", "phoneNumber", "companyName", "service", "message"];
   const updateData = {};
   for (const field of allowedFields) {
     if (req.body[field] !== undefined) {

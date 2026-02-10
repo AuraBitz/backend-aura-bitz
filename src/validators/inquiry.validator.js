@@ -5,6 +5,12 @@ const validateCreateInquiry = (data) => {
     errors.push({ field: "name", message: "Name is required" });
   }
 
+  if (!data.email || typeof data.email !== "string" || !data.email.trim()) {
+    errors.push({ field: "email", message: "Email is required" });
+  } else if (!/^\S+@\S+\.\S+$/.test(data.email)) {
+    errors.push({ field: "email", message: "Please provide a valid email address" });
+  }
+
   if (!data.phoneNumber || typeof data.phoneNumber !== "string" || !data.phoneNumber.trim()) {
     errors.push({ field: "phoneNumber", message: "Phone number is required" });
   }
@@ -29,7 +35,7 @@ const validateCreateInquiry = (data) => {
 
 const validateUpdateInquiry = (data) => {
   const errors = [];
-  const allowedFields = ["name", "phoneNumber", "companyName", "service", "message"];
+  const allowedFields = ["name", "email", "phoneNumber", "companyName", "service", "message"];
   const updateKeys = Object.keys(data);
 
   // Check if at least one valid field is provided
@@ -41,6 +47,14 @@ const validateUpdateInquiry = (data) => {
   // Validate individual fields if provided
   if (data.name !== undefined && (typeof data.name !== "string" || !data.name.trim())) {
     errors.push({ field: "name", message: "Name must be a non-empty string" });
+  }
+
+  if (data.email !== undefined) {
+    if (typeof data.email !== "string" || !data.email.trim()) {
+      errors.push({ field: "email", message: "Email must be a non-empty string" });
+    } else if (!/^\S+@\S+\.\S+$/.test(data.email)) {
+      errors.push({ field: "email", message: "Please provide a valid email address" });
+    }
   }
 
   if (data.phoneNumber !== undefined && (typeof data.phoneNumber !== "string" || !data.phoneNumber.trim())) {

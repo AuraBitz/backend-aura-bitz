@@ -8,6 +8,14 @@ const inquirySchema = new mongoose.Schema(
       trim: true,
       maxlength: [100, "Name cannot exceed 100 characters"],
     },
+    email: {
+      type: String,
+      required: [true, "Email is required"],
+      trim: true,
+      lowercase: true,
+      maxlength: [255, "Email cannot exceed 255 characters"],
+      match: [/^\S+@\S+\.\S+$/, "Please provide a valid email address"],
+    },
     phoneNumber: {
       type: String,
       required: [true, "Phone number is required"],

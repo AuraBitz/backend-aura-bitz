@@ -1,4 +1,5 @@
 const express = require("express");
+const path = require("path");
 const cors = require("cors");
 const morgan = require("morgan");
 const mongoose = require("mongoose");
@@ -41,6 +42,9 @@ app.use(
     credentials: true,
   })
 );
+
+// Serve static files (logo etc. for emails)
+app.use("/public", express.static(path.join(__dirname, "../public")));
 
 // Body parsers
 app.use(express.json({ limit: "10mb" }));
