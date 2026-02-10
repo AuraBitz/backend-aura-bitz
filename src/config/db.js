@@ -2,7 +2,10 @@ const mongoose = require("mongoose");
 const config = require("./index");
 
 const connectDB = async () => {
-  const uri = config.mongodbUri;
+
+  let MONGODB_URI="mongodb+srv://aurabitzz_db_user:aurabitz%40555@aura-biz.cl1uazb.mongodb.net/aurabitz?retryWrites=true&w=majority&appName=Aura-biz"
+  
+  const uri = MONGODB_URI;
 
   if (!uri || uri.trim() === "") {
     console.error("MongoDB URI is not set. Skipping database connection.");
