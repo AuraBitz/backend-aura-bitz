@@ -1,12 +1,24 @@
 const mongoose = require("mongoose");
+const config = require("./index");
 
 const connectDB = async () => {
+  const uri = config.mongodbUri;
+
+  if (!uri || uri.trim() === "") {
+    console.error("MongoDB URI is not set. Skipping database connection.");
+    console.error(
+      "Set MONGODB_URI in environment variables (Render Dashboard or .env file)."
+    );
+    return; // Don't crash the server - let health check & other routes work
+  }
+
   try {
-    const conn = await mongoose.connect(process.env.MONGODB_URI);
+    const conn = await mongoose.connect(uri);
     console.log(`MongoDB Connected: ${conn.connection.host}`);
   } catch (error) {
     console.error(`MongoDB Connection Error: ${error.message}`);
-    process.exit(1);
+    console.error("Server will continue running without database connection.");
+    // Don't exit - let the server run so other routes (health check) still work
   }
 };
 

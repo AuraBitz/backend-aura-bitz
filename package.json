@@ -2,10 +2,15 @@
   "name": "aurabitz-backend",
   "version": "1.0.0",
   "description": "Aura Bitz Backend API",
-  "main": "src/server.js",
+  "main": "index.js",
   "scripts": {
     "start": "node src/server.js",
-    "dev": "nodemon src/server.js"
+    "dev": "nodemon src/server.js",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log"
+  },
+  "engines": {
+    "node": "20"
   },
   "keywords": [],
   "author": "Aura Bitz",
@@ -14,6 +19,8 @@
     "cors": "^2.8.6",
     "dotenv": "^17.2.4",
     "express": "^5.2.1",
+    "firebase-admin": "^13.6.1",
+    "firebase-functions": "^6.6.0",
     "mongoose": "^9.1.6",
     "morgan": "^1.10.1"
   },
